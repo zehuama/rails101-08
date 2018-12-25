@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   before_action :find_group
   before_action :authenticate_user!
+  before_action :member_required, only: [:new, :create]
 
   def new
     @post = Post.new
@@ -54,6 +55,13 @@ class PostsController < ApplicationController
 
   def post_params
     params.require(:post).permit(:content)
+  end
+
+  def member_required
+    if !current_user.is_member_of?(@group)
+      flash[:warning] = "你不是本讨论版的成员，不能发文！"
+      redirect_to group_path(@group)
+    end
   end
 end
 # class PostsController < ApplicationController
